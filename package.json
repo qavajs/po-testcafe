@@ -1,20 +1,20 @@
 {
-  "name": "@qavajs/po-playwright",
-  "version": "0.0.9",
+  "name": "@qavajs/po-testcafe",
+  "version": "0.0.1",
   "description": "library for plain-english access to page object",
   "main": "index.js",
   "scripts": {
-    "test": "jest --coverage --detectOpenHandles",
+    "test": "jest --detectOpenHandles tests/*.spec.ts",
+    "test:testcafe": "testcafe chrome:headless tests/po.testcafe.ts",
     "build": "tsc"
   },
   "authors": [
-    "Alexander Galichenko",
-    "Alexandr Legchilov"
-    ],
+    "Alexander Galichenko"
+  ],
   "license": "MIT",
   "devDependencies": {
     "jest": "^29.5.0",
-    "playwright": "^1.32.3",
+    "testcafe": "^2.5.1-rc.1",
     "ts-jest": "^29.1.0",
     "typescript": "^5.0.4"
   }

@@ -1,14 +1,14 @@
-## @qavajs/po-playwright
+## @qavajs/po-testcafe
 
 This library provides the ability to create hierarchical page objects and access elements using plain-english selectors.
-Works on top of Playwright.
+Works on top of testcafe.
 
-`npm install @qavajs/po-playwright`
+`npm install @qavajs/po-testcafe`
 ## Usage
 
-Lib provides getElement method that resolves plain-english selector and return playwright locator.
+Lib provides getElement method that resolves plain-english selector and return testcafe selector.
 ```javascript
-const { po } = require('@qavajs/po-playwright');
+const { po } = require('@qavajs/po-testcafe');
 
 When(/^click '(.+)'$/, async function (alias) {
     const element = await po.getElement(alias);
@@ -29,7 +29,7 @@ An element can be defined in form of webdriverIO selector or as an instance of t
 
 Each not top-level component should have selector element in form of webdriverIO selector.
 ```javascript
-const { $, $$ } = require('@qavajs/po-playwright');
+const { $, $$ } = require('@qavajs/po-testcafe');
 
 class MultipleComponent {
     selector = '.list-components li';
@@ -55,10 +55,10 @@ Before using po object need to be initiated and hierarchy of elements needs to b
 The best place to do it is cucumber-js Before hook
 
 ```javascript
-const { po } = require('@qavajs/po-playwright');
+const { po } = require('@qavajs/po-testcafe');
 const pos = require('./app.js');
 Before(async function() {
-    po.init(page, { timeout: 10000 });  // page is an instance of playwright page
+    po.init({ timeout: 10000 });
     po.register(pos); // pos is page object hierarchy
 });
 ```

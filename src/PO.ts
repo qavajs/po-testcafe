@@ -1,24 +1,16 @@
 import parseTokens, { Token } from './parseTokens';
-import { Page, Locator } from 'playwright';
+import { Selector } from 'testcafe';
 import { Definition } from './register';
 
 interface PageObject {
     selector?: string;
 }
 
-interface ExtendedLocator extends Locator {
-    alias: string;
-}
-
-type Locatable = Page | Locator;
-
 class PO {
 
-    private driver: Page | null = null;
     private config: { timeout?: number } = {};
 
-    public init(driver: Page, options = { timeout: 2000 }) {
-        this.driver = driver;
+    public init(options = { timeout: 2000 }) {
         this.config.timeout = options.timeout;
     }
 
@@ -26,21 +18,17 @@ class PO {
      * Get element from page object
      * @public
      * @param {string} alias
-     * @returns { Locator }
+     * @returns { Selector }
      */
-    public async getElement(alias: string): Promise<ExtendedLocator> {
-        if (!this.driver) throw new Error('Driver is not attached. Call po.init(driver)')
+    public async getElement(alias: string): Promise<Selector> {
         const tokens: Array<Token> = parseTokens(alias);
-        let element: Locatable = this.driver;
         let po: PO | PageObject = this;
-        await this.driver.waitForLoadState();
+        let element = Selector('html');
         while (tokens.length > 0) {
             const token = tokens.shift() as Token;
             [element, po] = await this.getEl(element, po, token);
         }
-        const extendedElement = element as ExtendedLocator;
-        extendedElement.alias = alias;
-        return extendedElement
+        return element
     }
 
     public register(obj: Object) {
@@ -53,17 +41,17 @@ class PO {
     /**
      * Get element by provided page object and token
      * @private
-     * @param {Page | Locator} element
+     * @param {Selector} element
      * @param {Object} po
      * @param {Token} token
      * @returns
      */
-    private async getEl(element: Page | Locator, po: Object, token: Token): Promise<[Locatable, Object] | undefined> {
+    private async getEl(element: Selector, po: Object, token: Token): Promise<[Selector, Object] | undefined> {
         const elementName: string = token.elementName.replace(/\s/g, '');
         // @ts-ignore
         const newPo: Definition = po[elementName];
         if (!newPo) throw new Error(`${token.elementName} is not found`);
-        const currentElement = (newPo.ignoreHierarchy ? await this.driver : await element) as Locatable;
+        const currentElement = newPo.ignoreHierarchy ? Selector('html') : await element;
         if (!newPo.isCollection && token.suffix) throw new Error(`Unsupported operation. ${token.elementName} is not collection`);
         if (newPo.isCollection && !newPo.selector) throw new Error(`Unsupported operation. ${token.elementName} selector property is required as it is collection`);
         if (!newPo.selector) return [currentElement, newPo];
@@ -81,45 +69,45 @@ class PO {
 
     /**
      * @private
-     * @param {Locatable} element - element to get
+     * @param {Selector} element - element to get
      * @param {Definition} po - page object
      * @param {Token} token - token
      * @returns
      */
-    private async getElementByText(element: Locatable, po: Definition, token: Token): Promise<Locator> {
+    private async getElementByText(element: Selector, po: Definition, token: Token): Promise<Selector> {
         const tokenValue = token.value as string;
         if (token.prefix === '#') {
-            return element.locator(po.selector, { hasText: tokenValue }).nth(0);
+            return element.find(po.selector).withText(tokenValue);
         }
         if (token.prefix === '@') {
-            return element.locator(po.selector, { hasText: new RegExp(`^${tokenValue}$`) }).nth(0);
+            return element.find(po.selector).withExactText(tokenValue);
         }
         if (token.prefix === '/') {
-            return element.locator(po.selector, { hasText: new RegExp(tokenValue) }).nth(0);
+            return element.find(po.selector).withText(new RegExp(tokenValue));
         }
         throw new Error(`${token.prefix} is not supported`)
     }
 
     /**
      * @private
-     * @param {Locatable} element - element to get
+     * @param {Selector} element - element to get
      * @param {Definition} po - page object
      * @param {Token} token - token
      * @returns
      */
-    private async getElementByIndex(element: Locatable, po: Definition, token: Token): Promise<Locator> {
+    private async getElementByIndex(element: Selector, po: Definition, token: Token): Promise<Selector> {
         const index = parseInt(token.value as string) - 1;
-        return element.locator(po.selector).nth(index);
+        return element.find(po.selector).nth(index);
     }
 
     /**
      * @private
-     * @param {Locatable} element - element to get
+     * @param {Selector} element - element to get
      * @param {string} selector - selector
      * @returns
      */
-    private async getSingleElement(element: Locatable, selector: string) {
-        return element.locator(selector);
+    private async getSingleElement(element: Selector, selector: string) {
+        return element.find(selector);
     }
 
 }
