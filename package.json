@@ -11,6 +11,11 @@
   "authors": [
     "Alexander Galichenko"
   ],
+  "keywords": [
+    "QA",
+    "Testing",
+    "Test Automation"
+  ],
   "license": "MIT",
   "devDependencies": {
     "jest": "^29.5.0",
