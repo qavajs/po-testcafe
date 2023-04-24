@@ -1,6 +1,6 @@
 {
   "name": "@qavajs/po-testcafe",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "library for plain-english access to test cafe page object",
   "main": "index.js",
   "scripts": {
