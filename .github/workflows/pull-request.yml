@@ -3,7 +3,7 @@ name: Test
 on:
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   test:
@@ -18,3 +18,4 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm run test
+      - run: npm run test:testcafe
