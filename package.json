@@ -1,7 +1,7 @@
 {
   "name": "@qavajs/po-testcafe",
   "version": "0.0.1",
-  "description": "library for plain-english access to page object",
+  "description": "library for plain-english access to test cafe page object",
   "main": "index.js",
   "scripts": {
     "test": "jest --detectOpenHandles tests/*.spec.ts",
