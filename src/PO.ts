@@ -20,13 +20,13 @@ class PO {
      * @param {string} alias
      * @returns { Selector }
      */
-    public async getElement(alias: string): Promise<Selector> {
+    public getElement(alias: string): Selector {
         const tokens: Array<Token> = parseTokens(alias);
         let po: PO | PageObject = this;
         let element = Selector('html');
         while (tokens.length > 0) {
             const token = tokens.shift() as Token;
-            [element, po] = await this.getEl(element, po, token);
+            [element, po] = this.getEl(element, po, token);
         }
         return element
     }
@@ -46,25 +46,25 @@ class PO {
      * @param {Token} token
      * @returns
      */
-    private async getEl(element: Selector, po: Object, token: Token): Promise<[Selector, Object] | undefined> {
+    private getEl(element: Selector, po: Object, token: Token): [Selector, Object] | undefined {
         const elementName: string = token.elementName.replace(/\s/g, '');
         // @ts-ignore
         const newPo: Definition = po[elementName];
         if (!newPo) throw new Error(`${token.elementName} is not found`);
-        const currentElement = newPo.ignoreHierarchy ? Selector('html') : await element;
+        const currentElement = newPo.ignoreHierarchy ? Selector('html') : element;
         if (!newPo.isCollection && token.suffix) throw new Error(`Unsupported operation. ${token.elementName} is not collection`);
         if (newPo.isCollection && !newPo.selector) throw new Error(`Unsupported operation. ${token.elementName} selector property is required as it is collection`);
         if (!newPo.selector) return [currentElement, newPo];
 
         if (newPo.isCollection && token.suffix === 'in') return [
-            await this.getElementByText(currentElement, newPo, token),
+            this.getElementByText(currentElement, newPo, token),
             newPo
         ];
         if (newPo.isCollection && token.suffix === 'of') return [
-            await this.getElementByIndex(currentElement, newPo, token),
+            this.getElementByIndex(currentElement, newPo, token),
             newPo
         ];
-        return [await this.getSingleElement(currentElement, newPo.selector), newPo]
+        return [this.getSingleElement(currentElement, newPo.selector), newPo]
     }
 
     /**
@@ -74,7 +74,7 @@ class PO {
      * @param {Token} token - token
      * @returns
      */
-    private async getElementByText(element: Selector, po: Definition, token: Token): Promise<Selector> {
+    private getElementByText(element: Selector, po: Definition, token: Token): Selector {
         const tokenValue = token.value as string;
         if (token.prefix === '#') {
             return element.find(po.selector).withText(tokenValue);
@@ -95,7 +95,7 @@ class PO {
      * @param {Token} token - token
      * @returns
      */
-    private async getElementByIndex(element: Selector, po: Definition, token: Token): Promise<Selector> {
+    private getElementByIndex(element: Selector, po: Definition, token: Token): Selector {
         const index = parseInt(token.value as string) - 1;
         return element.find(po.selector).nth(index);
     }
@@ -106,7 +106,7 @@ class PO {
      * @param {string} selector - selector
      * @returns
      */
-    private async getSingleElement(element: Selector, selector: string) {
+    private getSingleElement(element: Selector, selector: string) {
         return element.find(selector);
     }
 

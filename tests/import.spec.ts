@@ -1,5 +1,5 @@
-import {test, expect} from '@jest/globals';
-import {po, $, $$, Component} from '../index';
+import { test, expect } from '@jest/globals';
+import { po, $, $$, Component } from '../index';
 
 test('po', () => {
     expect(po.init).toBeInstanceOf(Function);
